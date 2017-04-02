@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Warden.Core;
 using Warden.Watchers.Web;
 using Warden.Services.WardenHost.Services;
+using Warden.Services.WardenHost.Framework;
 
 namespace Warden.Services.WardenHost
 {
@@ -11,7 +12,11 @@ namespace Warden.Services.WardenHost
     {
         public static void Main(string[] args)
         {
-            Task.WaitAll(StartAsync());
+            Bootstrapper.Initialize();
+            Console.WriteLine("Press any key to quit...");
+            Console.ReadKey();
+            Console.WriteLine("Stopping WardenHost service... Bye!");
+            // Task.WaitAll(StartAsync());
         }
 
         private static async Task StartAsync()
@@ -24,6 +29,7 @@ namespace Warden.Services.WardenHost
             await wardenHost.AddWardenAsync(userId, CreateWarden("Warden #4", 10));
             await wardenHost.AddWardenAsync(userId, CreateWarden("Warden #5", 2));
             await wardenHost.StartAllWardensAsync();
+
         }
 
         private static IWarden CreateWarden(string name, int interval = 5)
