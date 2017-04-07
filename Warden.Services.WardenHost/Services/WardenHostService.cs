@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -5,33 +6,33 @@ namespace Warden.Services.WardenHost.Services
 {
     public class WardenHostService : IWardenHostService
     {
-        private readonly IDictionary<string, IWarden> _wardens = new Dictionary<string, IWarden>();
+        private readonly IDictionary<Guid, IWarden> _wardens = new Dictionary<Guid, IWarden>();
 
-        public async Task AddWardenAsync(string userId, IWarden warden)
+        public async Task AddWardenAsync(Guid wardenId, IWarden warden)
         {
-            _wardens[warden.Name] = warden;
+            _wardens[wardenId] = warden;
             await Task.CompletedTask;
         }
 
-        public async Task RemoveWardenAsync(string userId, string name)
+        public async Task RemoveWardenAsync(Guid wardenId)
         {
-            _wardens.Remove(name);
+            _wardens.Remove(wardenId);
             await Task.CompletedTask;
         }
 
-        public async Task StartWardenAsync(string userId, string name)
+        public async Task StartWardenAsync(Guid wardenId)
         {
-            await _wardens[name].StartAsync();
+            await _wardens[wardenId].StartAsync();
         }
 
-        public async Task StopWardenAsync(string name)
+        public async Task StopWardenAsync(Guid wardenId)
         {
-            await _wardens[name].StopAsync();
+            await _wardens[wardenId].StopAsync();
         }
 
-        public async Task PauseWardenAsync(string name)
+        public async Task PauseWardenAsync(Guid wardenId)
         {
-            await _wardens[name].PauseAsync();
+            await _wardens[wardenId].PauseAsync();
         }
 
         public async Task StartAllWardensAsync()

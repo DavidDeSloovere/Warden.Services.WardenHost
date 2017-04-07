@@ -4,12 +4,12 @@ using Autofac;
 using Microsoft.Extensions.Configuration;
 using RawRabbit.Configuration;
 using Warden.Common.Extensions;
+using Warden.Common.Handlers;
 using Warden.Common.Host;
 using Warden.Common.RabbitMq;
 using Warden.Messages.Commands;
-using Warden.Messages.Commands.WardenChecks;
-using Warden.Messages.Events;
-using Warden.Messages.Events.Organizations;
+using Warden.Messages.Commands.Spawn;
+using Warden.Services.WardenHost.Services;
 
 namespace Warden.Services.WardenHost.Framework
 {
@@ -37,7 +37,12 @@ namespace Warden.Services.WardenHost.Framework
                 .Create<Program>()
                 .UseAutofac(LifetimeScope)
                 .UseRabbitMq(queueName: typeof(Program).Namespace)
-                .SubscribeToEvent<WardenCreated>()
+                .SubscribeToCommand<SpawnWarden>()
+                // .SubscribeToCommand<StartWarden>()
+                // .SubscribeToCommand<StopWarden>()
+                // .SubscribeToCommand<PauseWarden>()
+                // .SubscribeToCommand<PingWarden>()
+                // .SubscribeToCommand<KillWarden>()
                 .Build()
                 .Run();
             _configured = true;
@@ -45,13 +50,15 @@ namespace Warden.Services.WardenHost.Framework
 
         private static ILifetimeScope GetLifetimeScope()
         {
-            var containerBuilder = new ContainerBuilder();
-                var assembly = typeof(Program).GetTypeInfo().Assembly;
-                containerBuilder.RegisterAssemblyTypes(assembly).AsClosedTypesOf(typeof(IEventHandler<>));
-                containerBuilder.RegisterAssemblyTypes(assembly).AsClosedTypesOf(typeof(ICommandHandler<>));
-                RabbitMqContainer.Register(containerBuilder, Configuration.GetSettings<RawRabbitConfiguration>());
+            var builder = new ContainerBuilder();
+            builder.RegisterType<Handler>().As<IHandler>();
+            builder.RegisterType<WardenFactory>().As<IWardenFactory>().SingleInstance();
+            builder.RegisterType<WardenHostService>().As<IWardenHostService>().SingleInstance();
+            var assembly = typeof(Program).GetTypeInfo().Assembly;
+            builder.RegisterAssemblyTypes(assembly).AsClosedTypesOf(typeof(ICommandHandler<>));
+            RabbitMqContainer.Register(builder, Configuration.GetSettings<RawRabbitConfiguration>());
 
-            return containerBuilder.Build();
+            return builder.Build();
         }
     }
 }
