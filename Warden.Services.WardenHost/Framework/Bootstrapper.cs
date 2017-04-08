@@ -38,11 +38,11 @@ namespace Warden.Services.WardenHost.Framework
                 .UseAutofac(LifetimeScope)
                 .UseRabbitMq(queueName: typeof(Program).Namespace)
                 .SubscribeToCommand<SpawnWarden>()
-                // .SubscribeToCommand<StartWarden>()
-                // .SubscribeToCommand<StopWarden>()
-                // .SubscribeToCommand<PauseWarden>()
-                // .SubscribeToCommand<PingWarden>()
-                // .SubscribeToCommand<KillWarden>()
+                .SubscribeToCommand<StartWarden>()
+                .SubscribeToCommand<StopWarden>()
+                .SubscribeToCommand<PauseWarden>()
+                .SubscribeToCommand<PingWarden>()
+                .SubscribeToCommand<KillWarden>()
                 .Build()
                 .Run();
             _configured = true;

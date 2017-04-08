@@ -30,9 +30,9 @@ namespace Warden.Services.WardenHost.Handlers
             await _handler
                 .Run(async () => 
                 {
+                    Console.WriteLine($"Spawned new warden: '{command.WardenId}' -> '{command.Name}'.");
                     var warden = _wardenFactory.Create(command.Name);
                     await _wardenHostService.AddWardenAsync(command.WardenId, warden);
-                    // await _wardenHostService.StartWardenAsync(command.WardenId);
                 })
                 .OnSuccess(async () =>
                 {
